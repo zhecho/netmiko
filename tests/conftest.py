@@ -7,7 +7,7 @@ import pytest
 
 from netmiko import ConnectHandler, FileTransfer, InLineTransfer, SSHDetect
 from tests.test_utils import parse_yaml
-from mock_device import ClassFactory
+from tests.mock_device import ClassFactory
 
 
 PWD = path.dirname(path.realpath(__file__))
@@ -46,9 +46,10 @@ def mock_net_connect(request):
     test_devices = parse_yaml(PWD + "/etc/test_devices.yml")
     device = test_devices[device_under_test]
     device["verbose"] = False
-    NetmikoClass, args, kwargs = ConnectHandler(**device, mock=True)
+    device["mock"] = True
+    NetmikoClass, args, kwargs = ConnectHandler(**device)
     MockDevice = ClassFactory(NetmikoClass)
-    conn = MockDevice(**device, mock=True)
+    conn = MockDevice(**device)
     return conn
 
 
