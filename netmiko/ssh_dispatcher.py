@@ -216,12 +216,16 @@ scp_platforms_str = "\n" + scp_platforms_str
 
 def ConnectHandler(*args, **kwargs):
     """Factory function selects the proper class and creates object based on device_type."""
+    mock = kwargs.pop("mock", None)
     if kwargs["device_type"] not in platforms:
         raise ValueError(
             "Unsupported device_type: "
             "currently supported platforms are: {}".format(platforms_str)
         )
     ConnectionClass = ssh_dispatcher(kwargs["device_type"])
+    if mock is True:
+        # Don't instantiate the object if mocking; return a reference to the class
+        return (ConnectionClass, args, kwargs)
     return ConnectionClass(*args, **kwargs)
 
 

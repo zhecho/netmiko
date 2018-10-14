@@ -73,6 +73,7 @@ class BaseConnection(object):
         session_log_file_mode="write",
         allow_auto_change=False,
         encoding="ascii",
+        mock=False,
     ):
         """
         Initialize attributes for establishing connection to target device.
@@ -270,14 +271,16 @@ class BaseConnection(object):
         # determine if telnet or SSH
         if "_telnet" in device_type:
             self.protocol = "telnet"
-            self._modify_connection_params()
-            self.establish_connection()
-            self._try_session_preparation()
+            if not mock:
+                self._modify_connection_params()
+                self.establish_connection()
+                self._try_session_preparation()
         elif "_serial" in device_type:
             self.protocol = "serial"
-            self._modify_connection_params()
-            self.establish_connection()
-            self._try_session_preparation()
+            if not mock:
+                self._modify_connection_params()
+                self.establish_connection()
+                self._try_session_preparation()
         else:
             self.protocol = "ssh"
 
@@ -299,9 +302,10 @@ class BaseConnection(object):
             # For SSH proxy support
             self.ssh_config_file = ssh_config_file
 
-            self._modify_connection_params()
-            self.establish_connection()
-            self._try_session_preparation()
+            if not mock:
+                self._modify_connection_params()
+                self.establish_connection()
+                self._try_session_preparation()
 
     def __enter__(self):
         """Establish a session using a Context Manager."""
